@@ -101,7 +101,10 @@ BEGIN
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', 'User'),
-    COALESCE(NEW.raw_user_meta_data->>'username', NEW.email)
+    COALESCE(
+      NEW.raw_user_meta_data->>'username',
+      'user_' || SUBSTRING(NEW.id::text FROM 1 FOR 8)
+    )
   );
   
   -- Atribui automaticamente o role de employee para novos usuários
@@ -221,15 +224,15 @@ CREATE TRIGGER on_auth_user_created
 CONFIGURAÇÕES IMPORTANTES:
 
 1. CRIAR USUÁRIO ADMIN:
-   - Criar conta através da interface com username "Admin" e senha "1234"
-   - Após criar, executar no backend:
+   - Utilize o painel de administração (ou o Supabase Auth com chave de serviço) para criar o primeiro usuário
+   - Após criar, atualize seu papel para 'admin':
      UPDATE user_roles 
      SET role = 'admin' 
-     WHERE user_id = (SELECT id FROM profiles WHERE username = 'Admin');
+     WHERE user_id = (SELECT id FROM profiles WHERE username = '<usuario_admin>');
 
 2. AUTENTICAÇÃO:
-   - Email auto-confirm está habilitado para facilitar testes
-   - Usuários utilizam formato: username@shiftsync.internal
+   - O aplicativo só solicita usuário e senha; o e-mail exigido pelo Supabase é gerado automaticamente no backend
+   - Garanta que o domínio usado para gerar e-mails sintéticos esteja configurado via variável de ambiente (ex.: VITE_APP_EMAIL_DOMAIN)
 
 3. SEGURANÇA:
    - Todas as tabelas têm Row Level Security (RLS) habilitado
