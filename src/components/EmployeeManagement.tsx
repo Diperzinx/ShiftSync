@@ -25,6 +25,9 @@ const EmployeeManagement = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { toast } = useToast();
 
+  const emailDomain = import.meta.env.VITE_APP_EMAIL_DOMAIN || "shiftsync.app";
+  const buildEmail = (name: string) => `${name}@${emailDomain}`;
+
   const fetchEmployees = async () => {
     const { data, error } = await supabase
       .from("profiles")
@@ -56,7 +59,7 @@ const EmployeeManagement = () => {
     
     try {
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: `${newEmployeeUsername}@shiftsync.internal`,
+        email: buildEmail(newEmployeeUsername),
         password: newEmployeePassword,
         options: {
           data: {

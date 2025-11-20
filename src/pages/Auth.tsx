@@ -14,6 +14,8 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
+  const emailDomain = import.meta.env.VITE_APP_EMAIL_DOMAIN || "shiftsync.app";
+  const buildEmail = (name: string) => `${name}@${emailDomain}`;
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -34,7 +36,7 @@ const Auth = () => {
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({
-          email: `${username}@shiftsync.internal`,
+          email: buildEmail(username),
           password,
         });
 
@@ -48,7 +50,7 @@ const Auth = () => {
         navigate("/dashboard");
       } else {
         const { error } = await supabase.auth.signUp({
-          email: `${username}@shiftsync.internal`,
+          email: buildEmail(username),
           password,
           options: {
             data: {
